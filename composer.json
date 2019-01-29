@@ -1,0 +1,40 @@
+{
+	"name": "kuriousagency/commerce-bulk-pricing",
+	"description": "Bulk pricing for products",
+	"type": "craft-plugin",
+	"version": "1.0.0",
+	"keywords": [
+		"craft",
+		"cms",
+		"craftcms",
+		"craft-plugin",
+		"commerce bulk pricing"
+	],
+	"support": {
+		"docs": "https://github.com/KuriousAgency/commerce-bulk-pricing/blob/master/README.md",
+		"issues": "https://github.com/KuriousAgency/commerce-bulk-pricing/issues"
+	},
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Kurious Agency",
+			"homepage": "https://kurious.agency"
+		}
+	],
+	"require": {
+		"craftcms/cms": "^3.0.0-RC1"
+	},
+	"autoload": {
+		"psr-4": {
+			"kuriousagency\\commerce\\bulkpricing\\": "src/"
+		}
+	},
+	"extra": {
+		"name": "Commerce Bulk Pricing",
+		"handle": "commerce-bulk-pricing",
+		"hasCpSettings": false,
+		"hasCpSection": false,
+		"changelogUrl": "https://raw.githubusercontent.com/KuriousAgency/commerce-bulk-pricing/master/CHANGELOG.md",
+		"class": "kuriousagency\\commerce\\bulkpricing\\BulkPricing"
+	}
+}
