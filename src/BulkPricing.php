@@ -11,9 +11,13 @@
 namespace kuriousagency\commerce\bulkpricing;
 
 use kuriousagency\commerce\bulkpricing\fields\BulkPricingField;
+use kuriousagency\commerce\bulkpricing\models\Settings;
+use kuriousagency\commerce\bulkpricing\adjusters\Tax;
 
 use craft\commerce\events\LineItemEvent;
 use craft\commerce\services\LineItems;
+use craft\commerce\services\OrderAdjustments;
+use craft\commerce\events\DiscountAdjustmentsEvent;
 
 use Craft;
 use craft\base\Plugin;
@@ -77,25 +81,69 @@ class BulkPricing extends Plugin
                 }
             }
 		);
+
+		Event::on(OrderAdjustments::class, OrderAdjustments::EVENT_REGISTER_ORDER_ADJUSTERS, function(RegisterComponentTypesEvent $e) {
+			
+			/*$types = [
+				Discount3for2::class, 
+				Bundles::class, 
+				Trade::class, 
+			];*/
+			
+			foreach ($e->types as $key => $type)
+			{
+				if ($type == 'craft\\commerce\\adjusters\\Tax') {
+					array_splice($e->types, $key, 1, [
+						Tax::class,
+					]);
+				}
+				//$types[] = $type;
+			}
+			//$e->types = $types;
+		});
+
 		
 		Event::on(LineItems::class, LineItems::EVENT_POPULATE_LINE_ITEM, function(LineItemEvent $event) {
 			$order = $event->lineItem->getOrder();
 			$paymentCurrency = $order->getPaymentCurrency();
+			$user = $order->user;
+			
 
-			$element = $event->lineItem->purchasable->product->type->hasVariants ? $event->lineItem->purchasable : $event->lineItem->purchasable->product;
-			foreach ($element->getFieldValues() as $key => $field)
-			{
-				if (get_class(Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') {
-					foreach ($field[$paymentCurrency] as $qty => $value)
-					{
-						if ($event->lineItem->qty >= $qty && $value != '') {
-							$event->lineItem->price = $value;
+			// foreach ($this->getSettings()->userGroups as $group)
+			// {
+			// 	if ($user->isInGroup($group)) {
+			// 		$apply = true;
+			// 	}
+			// }
+
+			// if ($apply) {
+				$element = $event->lineItem->purchasable->product->type->hasVariants ? $event->lineItem->purchasable : $event->lineItem->purchasable->product;
+				foreach ($element->getFieldValues() as $key => $field)
+				{
+					if (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') {
+						$apply = false;
+						foreach ($f->userGroups as $group)
+						{
+							if ($user->isInGroup($group)) {
+								$apply = true;
+							}
+						}
+						if ($apply) {
+							foreach ($field[$paymentCurrency] as $qty => $value)
+							{
+								if ($qty != 'iso' && $event->lineItem->qty >= $qty && $value != '') {
+									$event->lineItem->price = $value;
+									$event->lineItem->snapshot['taxIncluded'] = (bool)$f->taxIncluded;
+									//Craft::dd($event->lineItem);
+								}
+							}
+
+							continue;
 						}
 					}
-
-					continue;
 				}
-			}
+				//Craft::dd($event->lineItem);
+			// }
 
 		});
 
@@ -106,10 +154,31 @@ class BulkPricing extends Plugin
                 ['name' => $this->name]
             ),
             __METHOD__
-        );
+		);
     }
 
     // Protected Methods
     // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    protected function createSettingsModel()
+    {
+        return new Settings();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function settingsHtml(): string
+    {
+        return Craft::$app->view->renderTemplate(
+            'commerce-bulk-pricing/settings',
+            [
+                'settings' => $this->getSettings()
+            ]
+        );
+    }
 
 }
