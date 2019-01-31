@@ -61,7 +61,9 @@ class BulkPricingField extends Field
 	
 	public $columnType = Schema::TYPE_TEXT;
 
-	//public $someAttribute;
+	public $userGroups;
+
+	public $taxIncluded;
 
 	//public $addRowLabel;
 
