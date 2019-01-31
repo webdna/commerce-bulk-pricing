@@ -163,15 +163,15 @@ class BulkPricing extends Plugin
     /**
      * @inheritdoc
      */
-    protected function createSettingsModel()
+    /*protected function createSettingsModel()
     {
         return new Settings();
-    }
+    }*/
 
     /**
      * @inheritdoc
      */
-    protected function settingsHtml(): string
+    /*protected function settingsHtml(): string
     {
         return Craft::$app->view->renderTemplate(
             'commerce-bulk-pricing/settings',
@@ -179,6 +179,6 @@ class BulkPricing extends Plugin
                 'settings' => $this->getSettings()
             ]
         );
-    }
+    }*/
 
 }
