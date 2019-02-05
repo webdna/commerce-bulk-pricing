@@ -120,15 +120,17 @@ class BulkPricing extends Plugin
 				$element = $event->lineItem->purchasable->product->type->hasVariants ? $event->lineItem->purchasable : $event->lineItem->purchasable->product;
 				foreach ($element->getFieldValues() as $key => $field)
 				{
-					if (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') {
+					if ( (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') && (is_array($field)) ) {
 						$apply = false;
+
 						foreach ($f->userGroups as $group)
 						{
 							if ($user->isInGroup($group)) {
 								$apply = true;
 							}
 						}
-						if ($apply) {
+						if ($apply && (array_key_exists($paymentCurrency,$field))) {
+
 							foreach ($field[$paymentCurrency] as $qty => $value)
 							{
 								if ($qty != 'iso' && $event->lineItem->qty >= $qty && $value != '') {
