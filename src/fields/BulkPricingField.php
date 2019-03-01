@@ -55,27 +55,11 @@ class BulkPricingField extends Field
         ]
 	];
 	
-	/*public $defaults = [
-        
-	];*/
-	
 	public $columnType = Schema::TYPE_TEXT;
 
 	public $userGroups;
 
 	public $taxIncluded;
-
-	//public $addRowLabel;
-
-    /**
-     * @var int|null Maximum number of Rows allowed
-     */
-    //public $maxRows;
-
-    /**
-     * @var int|null Minimum number of Rows allowed
-     */
-    //public $minRows;
 
     // Public Methods
 	// =========================================================================
@@ -84,17 +68,10 @@ class BulkPricingField extends Field
     {
         parent::init();
 
-        /*if ($this->addRowLabel === null) {
-            $this->addRowLabel = Craft::t('app', 'Add a row');
-        }*/
-
         if (!is_array($this->columns)) {
             $this->columns = [];
         }
 
-        /*if (!is_array($this->defaults)) {
-            $this->defaults = [];
-        }*/
     }
 	
 	
@@ -123,24 +100,11 @@ class BulkPricingField extends Field
     {
         if (is_string($value) && !empty($value)) {
             $value = Json::decodeIfJson($value);
-		}/* else if ($value === null && $this->isFresh($element) && is_array($this->defaults)) {
-            $value = array_values($this->defaults);
-        }*/
+		}
 
         if (!is_array($value) || empty($this->columns)) {
             return null;
 		}
-		//Craft::dd($value);
-
-        // Normalize the values and make them accessible from both the col IDs and the handles
-        /*foreach ($value as &$row) {
-            foreach ($this->columns as $colId => $col) {
-                $row[$colId] = $row[$colId] ?? null;
-                if ($col['qty']) {
-                    $row[$col['qty']] = $row[$colId];
-                }
-            }
-        }*/
 
         return $value;
     }
@@ -188,24 +152,10 @@ class BulkPricingField extends Field
                 'code' => true,
                 'type' => 'number'
             ],
-            // 'type' => [
-            //     'heading' => Craft::t('app', 'Type'),
-            //     'code' => true,
-            //     'type' => 'number',
-            // ],
-            // 'type' => [
-            //     'heading' => Craft::t('app', 'Type'),
-            //     'class' => 'thin',
-            //     'type' => 'select',
-            //     'options' => $typeOptions,
-            // ],
 		];
 		
         $view = Craft::$app->getView();
 
-        //$view->registerAssetBundle(TimepickerAsset::class);
-		//$view->registerAssetBundle(TableSettingsAsset::class);
-		//Craft::dd(Json::encode($view->namespaceInputName('columns'), JSON_UNESCAPED_UNICODE));
         $view->registerJs('new Craft.TableFieldSettings(' .
             Json::encode($view->namespaceInputName('columns'), JSON_UNESCAPED_UNICODE) . ', ' .
             Json::encode($view->namespaceInputName('defaults'), JSON_UNESCAPED_UNICODE) . ', ' .
@@ -214,8 +164,6 @@ class BulkPricingField extends Field
             Json::encode($columnSettings, JSON_UNESCAPED_UNICODE) .
             ');');
 
-		//{% set input %}{% include "_includes/forms/editableTable" with config only %}{% endset %}
-    	//{{ forms.field(config, input) }}
         $columnsField = $view->renderTemplateMacro('_includes/forms', 'editableTableField', [
             [
                 'label' => Craft::t('app', 'Table Columns'),
@@ -228,23 +176,10 @@ class BulkPricingField extends Field
                 'initJs' => false
             ]
 		]);
-		
-		// $defaultsField = $view->renderTemplateMacro('_includes/forms', 'editableTableField', [
-        //     [
-        //         'label' => Craft::t('app', 'Default Values'),
-        //         'instructions' => Craft::t('app', 'Define the default values for the field.'),
-        //         'id' => 'defaults',
-        //         'name' => 'defaults',
-        //         'cols' => $this->columns,
-        //         'rows' => $this->defaults,
-        //         'initJs' => false
-        //     ]
-        // ]);
 
         return $view->renderTemplate('commerce-bulk-pricing/_components/fields/BulkPricingField_settings', [
             'field' => $this,
 			'columnsField' => $columnsField,
-			//'defaultsField' => $defaultsField,
         ]);
     }
 
@@ -253,8 +188,6 @@ class BulkPricingField extends Field
      */
     public function getInputHtml($value, ElementInterface $element = null): string
     {
-        // Register our asset bundle
-        // Craft::$app->getView()->registerAssetBundle(BulkPricingFieldAsset::class);
 
         // Get our id and namespace
         $id = Craft::$app->getView()->formatInputId($this->handle);
@@ -268,19 +201,6 @@ class BulkPricingField extends Field
             'prefix' => Craft::$app->getView()->namespaceInputId(''),
             ];
         $jsonVars = Json::encode($jsonVars);
-        // Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').BulkPricingField(" . $jsonVars . ");");
-
-        // Render the input template
-        /*return Craft::$app->getView()->renderTemplate(
-            'commerce-bulk-pricing/_components/fields/BulkPricingField_input',
-            [
-                'name' => $this->handle,
-                'value' => $value,
-                'field' => $this,
-                'id' => $id,
-                'namespacedId' => $namespacedId,
-            ]
-		);*/
 		
 		if (empty($this->columns)) {
             return '';
@@ -290,8 +210,6 @@ class BulkPricingField extends Field
 			'heading' => 'Currency',
 			'qty' => 'iso',
 		]], $this->columns);
-
-		//Craft::dd($this->columns);
 
         // Translate the column headings
         foreach ($this->columns as &$column) {
@@ -326,25 +244,6 @@ class BulkPricingField extends Field
 				$value[] = $val;
 			}
 		}
-		
-		//Craft::dd($value);
-
-		/*
-0 => [
-        'col6' => 'GBP'
-        'col1' => '9.10'
-        'col2' => '8.75'
-        'col3' => '8.60'
-        'col4' => '8.30'
-        'col5' => '8.10'
-        'currency' => 'GBP'
-        25 => '9.10'
-        50 => '8.75'
-        100 => '8.60'
-        200 => '8.30'
-        500 => '8.10'
-    ]
-		*/
 
         // Explicitly set each cell value to an array with a 'value' key
         $checkForErrors = $element && $element->hasErrors($this->handle);
@@ -369,25 +268,16 @@ class BulkPricingField extends Field
 			}
 		}
 
-        // Make sure the value contains at least the minimum number of rows
-        // if ($this->minRows) {
-        //     for ($i = count($value); $i < $this->minRows; $i++) {
-        //         $value[] = [];
-        //     }
-        // }
-
         $view = Craft::$app->getView();
 		$id = $view->formatInputId($this->handle);
 		
-		//Craft::dd($value);
-
         return $view->renderTemplate('commerce-bulk-pricing/_components/fields/BulkPricingField_input', [
             'id' => $id,
             'name' => $this->handle,
             'cols' => $this->columns,
             'rows' => $value,
-            'minRows' => null,//$this->minRows,
-            'maxRows' => null,//$this->maxRows,
+            'minRows' => null,
+            'maxRows' => null,
             'static' => false,
             'addRowLabel' => '',
         ]);
