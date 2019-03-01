@@ -360,7 +360,7 @@ class Tax extends \craft\commerce\adjusters\Tax
         $adjustment->type = self::ADJUSTMENT_TYPE;
         $adjustment->name = $rate->name;
         $adjustment->description = $rate->rate * 100 . '%' . ($rate->include ? ' inc' : '');
-        $adjustment->setOrder($this->_order);
+        $adjustment->orderId = $this->_order->id;
         $adjustment->sourceSnapshot = $rate->attributes;
 
         return $adjustment;
