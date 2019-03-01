@@ -1,6 +1,6 @@
 # Commerce Bulk Pricing plugin for Craft CMS 3.x
 
-A Craft fieldtype for setting product prices based on the quantity purchased or by user group
+A Craft fieldtype for setting product prices based on the quantity purchased and/or by user group
 
 ## Requirements
 
@@ -38,7 +38,7 @@ Add the Bulk Pricing field to a product and set the price for each quantity brac
 
 The fieldtype can also be used to set a price for certain user groups.
 
-Create a fieldtype with a quantity of 1 (price is not based a quantity)
+Create a fieldtype with a quantity of 1 - the same price is used regardless of quantity purchased
 
 ![Screenshot](resources/screenshots/member-price-field-settings.png)
 
