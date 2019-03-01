@@ -1,8 +1,6 @@
 # Commerce Bulk Pricing plugin for Craft CMS 3.x
 
-Bulk pricing for products
-
-![Screenshot](resources/img/plugin-logo.png)
+A Craft fieldtype for setting product prices based on the quantity purchased or by user group
 
 ## Requirements
 
@@ -18,26 +16,34 @@ To install the plugin, follow these instructions.
 
 2. Then tell Composer to load the plugin:
 
-        composer require KuriousAgency/commerce-bulk-pricing/commerce-bulk-pricing
+        composer require kuriousagency/commerce-bulk-pricing
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Commerce Bulk Pricing.
 
 ## Commerce Bulk Pricing Overview
 
--Insert text here-
+**Bulk Prices**
 
-## Configuring Commerce Bulk Pricing
+Create a Bulk Pricing fieldtype, add your column headers (e.g. 25+, 50+ 100+) and set the required quantity a customer must purchase to receive that price.
 
--Insert text here-
+There are additional options to restrict the prices to certain user groups and to specify if the prices set include tax.
 
-## Using Commerce Bulk Pricing
+![Screenshot](resources/screenshots/bulk-prices-field-settings.png)
 
--Insert text here-
+Add the Bulk Pricing field to a product and set the price for each quantity bracket
 
-## Commerce Bulk Pricing Roadmap
+![Screenshot](resources/screenshots/bulk-prices-product.png)
 
-Some things to do, and ideas for potential features:
+**User Group Prices**
 
-* Release it
+The fieldtype can also be used to set a price for certain user groups.
+
+Create a fieldtype with a quantity of 1 (price is not based a quantity)
+
+![Screenshot](resources/screenshots/member-price-field-settings.png)
+
+Set the product price for that user group
+
+![Screenshot](resources/screenshots/member-price-product.png)
 
 Brought to you by [Kurious Agency](https://kurious.agency)
