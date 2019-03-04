@@ -38,7 +38,7 @@ Add the Bulk Pricing field to a product and set the price for each quantity brac
 
 The fieldtype can also be used to set a price for certain user groups.
 
-Create a fieldtype with a quantity of 1 - the same price is used regardless of quantity purchased
+Create a fieldtype with a quantity of 1, the same price is used regardless of quantity purchased
 
 ![Screenshot](resources/screenshots/member-price-field-settings.png)
 
