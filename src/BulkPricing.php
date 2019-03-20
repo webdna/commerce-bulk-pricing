@@ -84,12 +84,6 @@ class BulkPricing extends Plugin
 
 		Event::on(OrderAdjustments::class, OrderAdjustments::EVENT_REGISTER_ORDER_ADJUSTERS, function(RegisterComponentTypesEvent $e) {
 			
-			/*$types = [
-				Discount3for2::class, 
-				Bundles::class, 
-				Trade::class, 
-			];*/
-			
 			foreach ($e->types as $key => $type)
 			{
 				if ($type == 'craft\\commerce\\adjusters\\Tax') {
@@ -97,9 +91,7 @@ class BulkPricing extends Plugin
 						Tax::class,
 					]);
 				}
-				//$types[] = $type;
 			}
-			//$e->types = $types;
 		});
 
 		
@@ -115,10 +107,12 @@ class BulkPricing extends Plugin
 						if ( (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') && (is_array($field)) ) {
 							$apply = false;
 
-							foreach ($f->userGroups as $group)
-							{
-								if ($user->isInGroup($group)) {
-									$apply = true;
+							if(is_array($f->userGroups)) {
+								foreach ($f->userGroups as $group)
+								{
+									if ($user->isInGroup($group)) {
+										$apply = true;
+									}
 								}
 							}
 							if ($apply && (array_key_exists($paymentCurrency,$field))) {
@@ -148,29 +142,5 @@ class BulkPricing extends Plugin
             __METHOD__
 		);
     }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    /*protected function createSettingsModel()
-    {
-        return new Settings();
-    }*/
-
-    /**
-     * @inheritdoc
-     */
-    /*protected function settingsHtml(): string
-    {
-        return Craft::$app->view->renderTemplate(
-            'commerce-bulk-pricing/settings',
-            [
-                'settings' => $this->getSettings()
-            ]
-        );
-    }*/
 
 }
