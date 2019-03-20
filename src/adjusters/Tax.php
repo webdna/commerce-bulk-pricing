@@ -194,18 +194,23 @@ class Tax extends \craft\commerce\adjusters\Tax
 
             return false;
 		}
-		
-		// check to see if this has bulk pricing field and if the prices include tax or not
-		/*foreach ($this->_order->getLineItems() as $item) {
-			if (isset($item->snapshot['taxIncluded'])) {
-				$taxRate->include = $item->snapshot['taxIncluded'];
-				continue;
-			}
-		}*/
 
         // Is this an order level tax rate?
         if (in_array($taxRate->taxable, [TaxRateRecord::TAXABLE_ORDER_TOTAL_PRICE, TaxRateRecord::TAXABLE_ORDER_TOTAL_SHIPPING], false)) {
-            $orderTaxableAmount = 0;
+			
+			$allItemsTaxFree = true;
+            foreach ($this->_order->getLineItems() as $item) {
+                if ($item->getPurchasable()->getIsTaxable()) {
+                    $allItemsTaxFree = false;
+                }
+            }
+
+            // Will not have any taxes, even for order level taxes.
+            if ($allItemsTaxFree) {
+                return [];
+            }
+			
+			$orderTaxableAmount = 0;
 
             if ($taxRate->taxable === TaxRateRecord::TAXABLE_ORDER_TOTAL_PRICE) {
                 $orderTaxableAmount = $this->_order->getTotalTaxablePrice();
@@ -214,14 +219,10 @@ class Tax extends \craft\commerce\adjusters\Tax
             if ($taxRate->taxable === TaxRateRecord::TAXABLE_ORDER_TOTAL_SHIPPING) {
                 $orderTaxableAmount = $this->_order->getAdjustmentsTotalByType('shipping');
 			}
-			//Craft::dd($zone);
-			//Craft::dump($taxRate->include);
-			//Craft::dump($taxIncluded);
-			//Craft::dd($orderTaxableAmount);
 
 			// get zone, is default? - does rate include tax
 			// not default -> does rate include tax? - prices do not include tax by default (reverse of above)
-			if ($zone->default) {
+			if (($zone && $zone->default) || $taxRate->getIsEverywhere()) {
 				//does rate include tax?
 				if ($taxRate->include) {
 					$amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
@@ -236,39 +237,7 @@ class Tax extends \craft\commerce\adjusters\Tax
 				}
 			}
 
-
-			//if ($zone->default) {
-				/*if (!$taxRate->include) {
-					$amount = $taxRate->rate * $orderTaxableAmount;
-				} else {
-					$amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
-				}*/
-			/*} else {
-				if (!$taxRate->include) {
-					$amount = $taxRate->rate * $orderTaxableAmount;
-				} else {
-					$amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
-				}
-			}*/
 			$orderTax = Currency::round($amount);
-
-            /*if (!$taxRate->include) {
-				// !$taxIncluded = trade
-				// $taxIncluded = customer
-				// TODO : check customer user group
-				if ($taxIncluded) 
-
-				if ($zone->default || !$taxIncluded) {
-				$amount = $taxRate->rate * $orderTaxableAmount;
-				} else {
-					$amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
-				}
-                $orderTax = Currency::round($amount);
-            } else {
-				//Craft::dd($orderTaxableAmount);
-                $amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
-                $orderTax = Currency::round($amount);
-            }*/
 
             $adjustment = $this->_createAdjustment($taxRate);
             // We need to display the adjustment that removed the included tax
@@ -283,8 +252,15 @@ class Tax extends \craft\commerce\adjusters\Tax
 
         // not an order level tax rate, create line item adjustments.
         foreach ($this->_order->getLineItems() as $item) {
-            if ($item->taxCategoryId == $taxRate->taxCategoryId) {
+            if ($item->taxCategoryId == $taxRate->taxCategoryId && $item->getPurchasable()->getIsTaxable()) {
+                /**
+                 * Any reduction in price to the line item we have added while inside this adjuster needs to be deducted,
+                 * since the discount adjustments we just added won't be picked up in getTaxableSubtotal()
+                 */
                 $taxableAmount = $item->getTaxableSubtotal($taxRate->taxable);
+                $objectId = spl_object_hash($item); // We use this ID since some line items are not saved in the DB yet and have no ID.
+                $taxableAmount += $this->_costRemovedByLineItem[$objectId] ?? 0;
+
                 if (!$taxRate->include) {
                     $amount = $taxRate->rate * $taxableAmount;
                     $itemTax = Currency::round($amount);
