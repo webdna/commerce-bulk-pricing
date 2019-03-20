@@ -7,9 +7,7 @@
 {%- set staticRows = static or (staticRows ?? false) or (minRows == 1 and maxRows == 1 and rows|length == 1) %}
 {%- set fixedRows = not staticRows and (minRows and minRows == maxRows and minRows == rows|length) %}
 
-{# {% if not static %} #}
-    <input type="hidden" name="{{ name }}" value="">
-{# {% endif %} #}
+<input type="hidden" name="{{ name }}" value="">
 
 <table id="{{ id }}" class="shadow-box editable"
        {%- if block('attr') is defined %} {{ block('attr') }}{% endif %}>
@@ -23,9 +21,6 @@
                     {%- endif -%}
                 </th>
             {% endfor %}
-            {% if not staticRows %}
-                {# <th colspan="{{ fixedRows ? 1 : 2 }}"></th> #}
-            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -50,17 +45,10 @@
                         </td>
                     {% endif %}
                 {% endfor %}
-                {% if not staticRows %}
-                    {# <td class="thin action"><a class="move icon" title="{{ 'Reorder'|t('app') }}"></a></td> #}
-                    {# {% if not fixedRows %}<td class="thin action"><a class="delete icon" title="{{ 'Delete'|t('app') }}"></a></td>{% endif %} #}
-                {% endif %}
             </tr>
         {% endfor %}
     </tbody>
 </table>
-{% if not staticRows and not fixedRows %}
-    {# <div class="btn add icon">{{ addRowLabel is defined ? addRowLabel : "Add a row"|t('app') }}</div> #}
-{% endif %}
 
 {% if initJs %}
     {% set jsId = id|namespaceInputId|e('js') %}
