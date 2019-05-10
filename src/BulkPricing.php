@@ -101,7 +101,7 @@ class BulkPricing extends Plugin
 			$user = $order->user;
 
 				if($user){
-					$element = $event->lineItem->purchasable->product->type->hasVariants ? $event->lineItem->purchasable : $event->lineItem->purchasable->product;
+					$element = (isset($event->lineItem->purchasable->product->type->hasVariants) && $event->lineItem->purchasable->product->type->hasVariants) ? $event->lineItem->purchasable : $event->lineItem->purchasable->product;
 					foreach ($element->getFieldValues() as $key => $field)
 					{
 						if ( (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') && (is_array($field)) ) {
