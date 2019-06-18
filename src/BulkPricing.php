@@ -102,30 +102,32 @@ class BulkPricing extends Plugin
 
 				if($user){
 					$element = (isset($event->lineItem->purchasable->product->type->hasVariants) && $event->lineItem->purchasable->product->type->hasVariants) ? $event->lineItem->purchasable : $event->lineItem->purchasable->product;
-					foreach ($element->getFieldValues() as $key => $field)
-					{
-						if ( (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') && (is_array($field)) ) {
-							$apply = false;
+					if ($element) {
+						foreach ($element->getFieldValues() as $key => $field)
+						{
+							if ( (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == 'kuriousagency\\commerce\\bulkpricing\\fields\\BulkPricingField') && (is_array($field)) ) {
+								$apply = false;
 
-							if(is_array($f->userGroups)) {
-								foreach ($f->userGroups as $group)
-								{
-									if ($user->isInGroup($group)) {
-										$apply = true;
+								if(is_array($f->userGroups)) {
+									foreach ($f->userGroups as $group)
+									{
+										if ($user->isInGroup($group)) {
+											$apply = true;
+										}
 									}
 								}
-							}
-							if ($apply && (array_key_exists($paymentCurrency,$field))) {
+								if ($apply && (array_key_exists($paymentCurrency,$field))) {
 
-								foreach ($field[$paymentCurrency] as $qty => $value)
-								{
-									if ($qty != 'iso' && $event->lineItem->qty >= $qty && $value != '') {
-										$event->lineItem->price = $value;
-										$event->lineItem->snapshot['taxIncluded'] = (bool)$f->taxIncluded;
+									foreach ($field[$paymentCurrency] as $qty => $value)
+									{
+										if ($qty != 'iso' && $event->lineItem->qty >= $qty && $value != '') {
+											$event->lineItem->price = $value;
+											$event->lineItem->snapshot['taxIncluded'] = (bool)$f->taxIncluded;
+										}
 									}
-								}
 
-								continue;
+									continue;
+								}
 							}
 						}
 					}

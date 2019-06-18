@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.0.12 - 2019-06-18
+
+### Fixed
+
+-   Check that element exists on populate line item handler
+
 ## 1.0.10
 
 ### Changed
