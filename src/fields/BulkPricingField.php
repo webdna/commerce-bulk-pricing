@@ -61,6 +61,8 @@ class BulkPricingField extends Field
 
 	public $taxIncluded;
 
+	public $guestUser;
+
     // Public Methods
 	// =========================================================================
 

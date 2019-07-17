@@ -26,7 +26,7 @@
 <div class="field">
 	<div class="heading">
 		<label>User Groups</label>
-		<div class="instructions"><p>Select the user groups that the Bulk pricing will be applied to.</p></div>
+		<div class="instructions"><p>Select the user groups that the Bulk pricing will be restricted to. If no user groups are selected then all users will see the bulk prices.</p></div>
 	</div>
 	<div class="input ltr">
 	{{ forms.checkboxGroup({
@@ -34,6 +34,19 @@
 		name: 'userGroups',
 		options: options,
 		values: field.userGroups,
+	}) }}
+	</div>
+</div>
+
+<div class="field">
+	<div class="heading">
+		<label>Allow Guest User</label>
+		<div class="instructions"><p>Can guest users see the bulk pricing?</p></div>
+	</div>
+	<div class="input ltr">
+	{{ forms.lightswitch({
+		name: 'guestUser',
+		on: field.guestUser
 	}) }}
 	</div>
 </div>
