@@ -124,6 +124,7 @@ class BulkPricing extends Plugin
 									foreach ($field[$paymentCurrency] as $qty => $value)
 									{
 										if ($qty != 'iso' && $event->lineItem->qty >= $qty && $value != '') {
+											$event->lineItem->salePrice = $value;
 											$event->lineItem->price = $value;
 											$event->lineItem->snapshot['taxIncluded'] = (bool)$f->taxIncluded;
 										}
