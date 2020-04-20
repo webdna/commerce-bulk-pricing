@@ -18,6 +18,8 @@ use craft\commerce\events\LineItemEvent;
 use craft\commerce\services\LineItems;
 use craft\commerce\services\OrderAdjustments;
 use craft\commerce\events\DiscountAdjustmentsEvent;
+use craft\commerce\records\Sale as SaleRecord;
+use craft\commerce\models\Sale;
 
 use Craft;
 use craft\base\Plugin;
@@ -124,12 +126,68 @@ class BulkPricing extends Plugin
 									foreach ($field[$paymentCurrency] as $qty => $value)
 									{
 										if ($qty != 'iso' && $event->lineItem->qty >= $qty && $value != '') {
-											$event->lineItem->salePrice = $value;
 											$event->lineItem->price = $value;
+											if ($event->lineItem->purchasable->getSales()) {
+												$originalPrice = $value;
+												$takeOffAmount = 0;
+												$newPrice = null;
+
+												/** @var Sale $sale */
+												foreach ($event->lineItem->purchasable->getSales() as $sale) {
+
+													switch ($sale->apply) {
+														case SaleRecord::APPLY_BY_PERCENT:
+															// applyAmount is stored as a negative already
+															$takeOffAmount += ($sale->applyAmount * $originalPrice);
+															
+															if ($sale->ignorePrevious) {
+																$newPrice = $originalPrice + ($sale->applyAmount * $originalPrice);
+															}
+															break;
+														case SaleRecord::APPLY_TO_PERCENT:
+															// applyAmount needs to be reversed since it is stored as negative
+															$newPrice = (-$sale->applyAmount * $originalPrice);
+															break;
+														case SaleRecord::APPLY_BY_FLAT:
+															// applyAmount is stored as a negative already
+															$takeOffAmount += $sale->applyAmount;
+															if ($sale->ignorePrevious) {
+																// applyAmount is always negative so add the negative amount to the original price for the new price.
+																$newPrice = $originalPrice + $sale->applyAmount;
+															}
+															break;
+														case SaleRecord::APPLY_TO_FLAT:
+															// applyAmount needs to be reversed since it is stored as negative
+															$newPrice = -$sale->applyAmount;
+															break;
+													}
+
+													// If the stop processing flag is true, it must been the last
+													// since the sales for this purchasable would have returned it last.
+													if ($sale->stopProcessing) {
+														break;
+													}
+												}
+												
+												$salePrice = ($originalPrice + $takeOffAmount);
+
+												// A newPrice has been set so use it.
+												if (null !== $newPrice) {
+													$salePrice = $newPrice;
+												}
+
+												if ($salePrice < 0) {
+													$salePrice = 0;
+												}
+												$event->lineItem->saleAmount = strval($takeOffAmount);
+												$event->lineItem->salePrice = strval($salePrice);
+											} else {
+												$event->lineItem->salePrice = strval($value);
+											}
+											
 											$event->lineItem->snapshot['taxIncluded'] = (bool)$f->taxIncluded;
 										}
 									}
-
 									continue;
 								}
 							}
