@@ -157,7 +157,7 @@ class BulkPricingField extends Field
 		];
 		
         $view = Craft::$app->getView();
-
+        $view->registerAssetBundle(TableSettingsAsset::class);
         $view->registerJs('new Craft.TableFieldSettings(' .
             Json::encode($view->namespaceInputName('columns'), JSON_UNESCAPED_UNICODE) . ', ' .
             Json::encode($view->namespaceInputName('defaults'), JSON_UNESCAPED_UNICODE) . ', ' .

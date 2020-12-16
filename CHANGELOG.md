@@ -4,13 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 1.1.2 
+## 1.1.3 - 2020-12-16
+
+### Fixed
+
+-   Fixed a bug when trying to add a new column to a bulk pricing field
+
+### Added
+
+- Now requires Craft 3.4+.
+- Missing requirement for Craft Commerce 2 or 3.
+
+## 1.1.2 - 2020-03-06
 
 ### Added
 
 -   Set lineitem->salePrice in addition to lineitem->price when calculating bulk price.
 
-## 1.1.1 - unreleased
+## 1.1.1 - 2020-03-06
 
 ### Changed
 
