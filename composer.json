@@ -2,7 +2,7 @@
 	"name": "kuriousagency/commerce-bulk-pricing",
 	"description": "Bulk pricing for products",
 	"type": "craft-plugin",
-	"version": "1.1.5",
+	"version": "1.1.6",
 	"keywords": [
 		"craft",
 		"cms",
