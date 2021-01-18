@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.1.4 - 2021-01-18
->   {warning} Sales are now applied to bulk prices whereas previosuly they weren't. Please check all your products and sales to avoid any unexpected sales being applied.
+> {warning} Sales are now applied to bulk prices whereas previosuly they weren't. Please check all your products and sales to avoid any unexpected sales being applied.
 
 ### Added
 
