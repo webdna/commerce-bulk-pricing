@@ -4,7 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.1.7 - 2022-04-14
+
+### Fixed
+
+-   Fixed a bug in the tax adjuster where the tax wasn't being calcualted correctly for each line item
+
+## 1.1.6 - 2021-01-18
+
+### Fixed
+
+-   Changelog Fix
+
+## 1.1.5 - 2021-01-18
+
+### Fixed
+
+-   Changelog Fix
+
 ## 1.1.4 - 2021-01-18
+
 > {warning} Sales are now applied to bulk prices whereas previosuly they weren't. Please check all your products and sales to avoid any unexpected sales being applied.
 
 ### Added
@@ -19,8 +38,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Added
 
-- Now requires Craft 3.4+.
-- Missing requirement for Craft Commerce 2 or 3.
+-   Now requires Craft 3.4+.
+-   Missing requirement for Craft Commerce 2 or 3.
 
 ## 1.1.2 - 2020-03-06
 
