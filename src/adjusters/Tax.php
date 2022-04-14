@@ -184,7 +184,6 @@ class Tax extends \craft\commerce\adjusters\Tax
                         $adjustment->type = 'discount';
 
 						$adjustments[] = $adjustment;
-						return [$adjustment];
                     }
                 }
 
