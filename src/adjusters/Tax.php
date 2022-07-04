@@ -4,11 +4,11 @@
  *
  * Bulk pricing for products
  *
- * @link      https://kurious.agency
- * @copyright Copyright (c) 2019 Kurious Agency
+ * @link      https://webdna.co.uk
+ * @copyright Copyright (c) 2019 webdna
  */
 
-namespace kuriousagency\commerce\bulkpricing\adjusters;
+namespace webdna\commerce\bulkpricing\adjusters;
 
 use Craft;
 use craft\base\Component;
@@ -36,25 +36,25 @@ class Tax extends \craft\commerce\adjusters\Tax
     // Constants
     // =========================================================================
 
-    const ADJUSTMENT_TYPE = 'tax';
+    public const ADJUSTMENT_TYPE = 'tax';
 
     // Properties
     // =========================================================================
 
     /**
-     * @var
+     * @var Validator
      */
-    private $_vatValidator;
+    private Validator $_vatValidator;
 
     /**
      * @var Order
      */
-    private $_order;
+    private Order $_order;
 
     /**
-     * @var Address
+     * @var Address|null
      */
-    private $_address;
+    private ?Address $_address = null;
 
     // Public Methods
     // =========================================================================
@@ -77,7 +77,7 @@ class Tax extends \craft\commerce\adjusters\Tax
 
         /** @var TaxRate $rate */
         foreach ($taxRates as $rate) {
-			//$rate->include = false;
+            //$rate->include = false;
             $newAdjustments = $this->_getAdjustments($rate);
             if ($newAdjustments) {
                 $adjustments[] = $newAdjustments;
@@ -98,20 +98,20 @@ class Tax extends \craft\commerce\adjusters\Tax
      * @param TaxRate $taxRate
      * @return OrderAdjustment[]|false
      */
-    private function _getAdjustments(TaxRate $taxRate)
+    private function _getAdjustments(TaxRate $taxRate): array|false
     {
         $zone = $taxRate->taxZone;
-		$adjustments = [];
-		$taxIncluded = true;
-		
-		// check to see if this has bulk pricing field and if the prices include tax or not
-		foreach ($this->_order->getLineItems() as $item) {
-			if (isset($item->snapshot['taxIncluded'])) {
-				$taxRate->include = $item->snapshot['taxIncluded'];
-				$taxIncluded = $item->snapshot['taxIncluded'];
-				continue;
-			}
-		}
+        $adjustments = [];
+        $taxIncluded = true;
+
+        // check to see if this has bulk pricing field and if the prices include tax or not
+        foreach ($this->_order->getLineItems() as $item) {
+            if (isset($item->snapshot['taxIncluded'])) {
+                $taxRate->include = $item->snapshot['taxIncluded'];
+                $taxIncluded = $item->snapshot['taxIncluded'];
+                continue;
+            }
+        }
 
         $removeVat = false;
 
@@ -165,8 +165,8 @@ class Tax extends \craft\commerce\adjusters\Tax
                     $adjustment->amount = $amount;
                     $adjustment->type = 'discount';
 
-					$adjustments[] = $adjustment;
-					return [$adjustment];
+                    $adjustments[] = $adjustment;
+                    return [$adjustment];
                 }
 
                 // Not an order level taxable, modify the line items.
@@ -183,7 +183,7 @@ class Tax extends \craft\commerce\adjusters\Tax
                         $adjustment->setLineItem($item);
                         $adjustment->type = 'discount';
 
-						$adjustments[] = $adjustment;
+                        $adjustments[] = $adjustment;
                     }
                 }
 
@@ -192,12 +192,12 @@ class Tax extends \craft\commerce\adjusters\Tax
             }
 
             return false;
-		}
+        }
 
         // Is this an order level tax rate?
         if (in_array($taxRate->taxable, [TaxRateRecord::TAXABLE_ORDER_TOTAL_PRICE, TaxRateRecord::TAXABLE_ORDER_TOTAL_SHIPPING], false)) {
-			
-			$allItemsTaxFree = true;
+
+            $allItemsTaxFree = true;
             foreach ($this->_order->getLineItems() as $item) {
                 if ($item->getPurchasable()->getIsTaxable()) {
                     $allItemsTaxFree = false;
@@ -208,8 +208,8 @@ class Tax extends \craft\commerce\adjusters\Tax
             if ($allItemsTaxFree) {
                 return [];
             }
-			
-			$orderTaxableAmount = 0;
+
+            $orderTaxableAmount = 0;
 
             if ($taxRate->taxable === TaxRateRecord::TAXABLE_ORDER_TOTAL_PRICE) {
                 $orderTaxableAmount = $this->_order->getTotalTaxablePrice();
@@ -217,26 +217,26 @@ class Tax extends \craft\commerce\adjusters\Tax
 
             if ($taxRate->taxable === TaxRateRecord::TAXABLE_ORDER_TOTAL_SHIPPING) {
                 $orderTaxableAmount = $this->_order->getAdjustmentsTotalByType('shipping');
-			}
+            }
 
-			// get zone, is default? - does rate include tax
-			// not default -> does rate include tax? - prices do not include tax by default (reverse of above)
-			if (($zone && $zone->default) || $taxRate->getIsEverywhere()) {
-				//does rate include tax?
-				if ($taxRate->include) {
-					$amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
-				} else {
-					$amount = $taxRate->rate * $orderTaxableAmount;
-				}
-			} else {
-				if ($taxIncluded) {
-					$amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
-				} else {
-					$amount = $taxRate->rate * $orderTaxableAmount;
-				}
-			}
+            // get zone, is default? - does rate include tax
+            // not default -> does rate include tax? - prices do not include tax by default (reverse of above)
+            if (($zone && $zone->default) || $taxRate->getIsEverywhere()) {
+                //does rate include tax?
+                if ($taxRate->include) {
+                    $amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
+                } else {
+                    $amount = $taxRate->rate * $orderTaxableAmount;
+                }
+            } else {
+                if ($taxIncluded) {
+                    $amount = $orderTaxableAmount - ($orderTaxableAmount / (1 + $taxRate->rate));
+                } else {
+                    $amount = $taxRate->rate * $orderTaxableAmount;
+                }
+            }
 
-			$orderTax = Currency::round($amount);
+            $orderTax = Currency::round($amount);
 
             $adjustment = $this->_createAdjustment($taxRate);
             // We need to display the adjustment that removed the included tax
@@ -302,10 +302,10 @@ class Tax extends \craft\commerce\adjusters\Tax
      * @param string $businessVatId
      * @return bool
      */
-    private function _validateVatNumber($businessVatId)
+    private function _validateVatNumber($businessVatId): bool
     {
         try {
-			return $this->_getVatValidator()->validate($businessVatId);
+            return $this->_getVatValidator()->validate($businessVatId);
         } catch (\Exception $e) {
             Craft::error('Communication with VAT API failed: ' . $e->getMessage(), __METHOD__);
 
@@ -316,7 +316,7 @@ class Tax extends \craft\commerce\adjusters\Tax
     /**
      * @return Validator
      */
-    private function _getVatValidator()
+    private function _getVatValidator(): Validator
     {
         if ($this->_vatValidator === null) {
             $this->_vatValidator = new Validator();
@@ -335,7 +335,7 @@ class Tax extends \craft\commerce\adjusters\Tax
         $adjustment->type = self::ADJUSTMENT_TYPE;
         $adjustment->name = $rate->name;
         $adjustment->description = $rate->rate * 100 . '%' . ($rate->include ? ' inc' : '');
-        $adjustment->orderId = $this->_order->id;
+        $adjustment->setOrder($this->_order);
         $adjustment->sourceSnapshot = $rate->attributes;
 
         return $adjustment;

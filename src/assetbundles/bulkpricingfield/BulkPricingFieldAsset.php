@@ -4,18 +4,18 @@
  *
  * Bulk pricing for products
  *
- * @link      https://kurious.agency
- * @copyright Copyright (c) 2019 Kurious Agency
+ * @link      https://webdna.co.uk
+ * @copyright Copyright (c) 2019 webdna
  */
 
-namespace kuriousagency\commerce\bulkpricing\assetbundles\bulkpricingfield;
+namespace webdna\commerce\bulkpricing\assetbundles\bulkpricingfield;
 
 use Craft;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
 /**
- * @author    Kurious Agency
+ * @author    webdna
  * @package   CommerceBulkPricing
  * @since     1.0.0
  */
@@ -29,7 +29,7 @@ class BulkPricingFieldAsset extends AssetBundle
      */
     public function init()
     {
-        $this->sourcePath = "@kuriousagency/commerce-bulk-pricing/assetbundles/bulkpricingfield/dist";
+        $this->sourcePath = "@webdna/commerce-bulk-pricing/assetbundles/bulkpricingfield/dist";
 
         $this->depends = [
             CpAsset::class,
