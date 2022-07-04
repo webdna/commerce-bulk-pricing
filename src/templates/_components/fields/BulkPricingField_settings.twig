@@ -5,9 +5,9 @@
  *
  * CommerceBulkPricingField Field Settings
  *
- * @author    Kurious Agency
- * @copyright Copyright (c) 2019 Kurious Agency
- * @link      https://kurious.agency
+ * @author    webdna
+ * @copyright Copyright (c) 2019 webdna
+ * @link      https://webdna.co.uk
  * @package   CommerceBulkPricing
  * @since     1.0.0
  */
@@ -20,46 +20,46 @@
 
 {% set options = [] %}
 {% for group in craft.app.userGroups.getAllGroups() %}
-	{% set options = options|merge([{label:group.name, value:group.id}]) %}
+    {% set options = options|merge([{label:group.name, value:group.id}]) %}
 {% endfor %}
 
 <div class="field">
-	<div class="heading">
-		<label>User Groups</label>
-		<div class="instructions"><p>Select the user groups that the Bulk pricing will be restricted to. If no user groups are selected then all users will see the bulk prices.</p></div>
-	</div>
-	<div class="input ltr">
-	{{ forms.checkboxGroup({
-		label: 'User Groups',
-		name: 'userGroups',
-		options: options,
-		values: field.userGroups,
-	}) }}
-	</div>
+    <div class="heading">
+        <label>User Groups</label>
+        <div class="instructions"><p>Select the user groups that the Bulk pricing will be restricted to. If no user groups are selected then all users will see the bulk prices.</p></div>
+    </div>
+    <div class="input ltr">
+    {{ forms.checkboxGroup({
+        label: 'User Groups',
+        name: 'userGroups',
+        options: options,
+        values: field.userGroups,
+    }) }}
+    </div>
 </div>
 
 <div class="field">
-	<div class="heading">
-		<label>Allow Guest User</label>
-		<div class="instructions"><p>Can guest users see the bulk pricing?</p></div>
-	</div>
-	<div class="input ltr">
-	{{ forms.lightswitch({
-		name: 'guestUser',
-		on: field.guestUser
-	}) }}
-	</div>
+    <div class="heading">
+        <label>Allow Guest User</label>
+        <div class="instructions"><p>Can guest users see the bulk pricing?</p></div>
+    </div>
+    <div class="input ltr">
+    {{ forms.lightswitch({
+        name: 'guestUser',
+        on: field.guestUser
+    }) }}
+    </div>
 </div>
 
 <div class="field">
-	<div class="heading">
-		<label>Price include tax</label>
-		<div class="instructions"><p>Do the prices include tax?</p></div>
-	</div>
-	<div class="input ltr">
-	{{ forms.lightswitch({
-		name: 'taxIncluded',
-		on: field.taxIncluded
-	}) }}
-	</div>
+    <div class="heading">
+        <label>Price include tax</label>
+        <div class="instructions"><p>Do the prices include tax?</p></div>
+    </div>
+    <div class="input ltr">
+    {{ forms.lightswitch({
+        name: 'taxIncluded',
+        on: field.taxIncluded
+    }) }}
+    </div>
 </div>

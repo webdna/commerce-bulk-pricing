@@ -1,41 +1,41 @@
 {
-	"name": "kuriousagency/commerce-bulk-pricing",
-	"description": "Bulk pricing for products",
-	"type": "craft-plugin",
-	"version": "1.1.8",
-	"keywords": [
-		"craft",
-		"cms",
-		"craftcms",
-		"craft-plugin",
-		"commerce bulk pricing"
-	],
-	"support": {
-		"docs": "https://github.com/webdna/commerce-bulk-pricing/blob/master/README.md",
-		"issues": "https://github.com/webdna/commerce-bulk-pricing/issues"
-	},
-	"license": "proprietary",
-	"authors": [
-		{
-			"name": "WebDNA",
-			"homepage": "https://webdna.co.uk"
-		}
-	],
-	"require": {
-		"craftcms/cms": "^3.4.0",
-		"craftcms/commerce": "^2.0|^3.0"
-	},
-	"autoload": {
-		"psr-4": {
-			"kuriousagency\\commerce\\bulkpricing\\": "src/"
-		}
-	},
-	"extra": {
-		"name": "Commerce Bulk Pricing",
-		"handle": "commerce-bulk-pricing",
-		"hasCpSettings": false,
-		"hasCpSection": false,
-		"changelogUrl": "https://raw.githubusercontent.com/webdna/commerce-bulk-pricing/master/CHANGELOG.md",
-		"class": "kuriousagency\\commerce\\bulkpricing\\BulkPricing"
-	}
+  "name": "webdna/commerce-bulk-pricing",
+  "description": "Bulk pricing for products",
+  "type": "craft-plugin",
+  "version": "1.1.8",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin",
+    "commerce bulk pricing"
+  ],
+  "support": {
+    "docs": "https://github.com/webdna/commerce-bulk-pricing/blob/master/README.md",
+    "issues": "https://github.com/webdna/commerce-bulk-pricing/issues"
+  },
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "webdna",
+      "homepage": "https://webdna.co.uk"
+    }
+  ],
+  "require": {
+    "craftcms/cms": "^4.0.0",
+    "craftcms/commerce": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "webdna\\commerce\\bulkpricing\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Commerce Bulk Pricing",
+    "handle": "commerce-bulk-pricing",
+    "hasCpSettings": false,
+    "hasCpSection": false,
+    "changelogUrl": "https://raw.githubusercontent.com/webdna/commerce-bulk-pricing/master/CHANGELOG.md",
+    "class": "webdna\\commerce\\bulkpricing\\BulkPricing"
+  }
 }

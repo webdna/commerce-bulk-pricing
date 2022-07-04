@@ -4,14 +4,14 @@
  *
  * Bulk pricing for products
  *
- * @link      https://kurious.agency
- * @copyright Copyright (c) 2019 Kurious Agency
+ * @link      https://webdna.co.uk
+ * @copyright Copyright (c) 2019 webdna
  */
 
-namespace kuriousagency\commerce\bulkpricing\fields;
+namespace webdna\commerce\bulkpricing\fields;
 
-use kuriousagency\commerce\bulkpricing\BulkPricing;
-use kuriousagency\commerce\bulkpricing\assetbundles\bulkpricingfield\BulkPricingFieldAsset;
+use webdna\commerce\bulkpricing\BulkPricing;
+use webdna\commerce\bulkpricing\assetbundles\bulkpricingfield\BulkPricingFieldAsset;
 
 use craft\commerce\Plugin as Commerce;
 
@@ -20,6 +20,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\fields\data\ColorData;
+use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Json;
 use craft\validators\ColorValidator;
@@ -28,7 +29,7 @@ use craft\web\assets\timepicker\TimepickerAsset;
 use yii\db\Schema;
 
 /**
- * @author    Kurious Agency
+ * @author    webdna
  * @package   CommerceBulkPricing
  * @since     1.0.0
  */
@@ -46,27 +47,27 @@ class BulkPricingField extends Field
     public static function displayName(): string
     {
         return Craft::t('commerce-bulk-pricing', 'Bulk Pricing');
-	}
-	
-	public $columns = [
+    }
+
+    public $columns = [
         'col1' => [
             'heading' => '',
             'qty' => '',
         ]
-	];
-	
-	public $columnType = Schema::TYPE_TEXT;
+    ];
 
-	public $userGroups;
+    public $columnType = Schema::TYPE_TEXT;
 
-	public $taxIncluded;
+    public $userGroups;
 
-	public $guestUser;
+    public $taxIncluded;
+
+    public $guestUser;
 
     // Public Methods
-	// =========================================================================
+    // =========================================================================
 
-	public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -75,13 +76,13 @@ class BulkPricingField extends Field
         }
 
     }
-	
-	
+
+
 
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         $rules = parent::rules();
         return $rules;
@@ -98,15 +99,15 @@ class BulkPricingField extends Field
     /**
      * @inheritdoc
      */
-    public function normalizeValue($value, ElementInterface $element = null)
+    public function normalizeValue($value, ElementInterface $element = null): mixed
     {
         if (is_string($value) && !empty($value)) {
             $value = Json::decodeIfJson($value);
-		}
+        }
 
         if (!is_array($value) || empty($this->columns)) {
             return null;
-		}
+        }
 
         return $value;
     }
@@ -114,14 +115,14 @@ class BulkPricingField extends Field
     /**
      * @inheritdoc
      */
-    public function serializeValue($value, ElementInterface $element = null)
+    public function serializeValue($value, ElementInterface $element = null): mixed
     {
         if (!is_array($value) || empty($this->columns)) {
             return null;
-		}
-		return $value;
-		Craft::dump('serialize');
-		Craft::dd($value);
+        }
+        return $value;
+        Craft::dump('serialize');
+        Craft::dd($value);
 
         $serialized = [];
 
@@ -131,9 +132,9 @@ class BulkPricingField extends Field
                 $serializedRow[$colId] = parent::serializeValue($row[$colId] ?? null);
             }
             $serialized[] = $serializedRow;
-		}
-		
-		Craft::dd($serialized);
+        }
+
+        Craft::dd($serialized);
 
         return $serialized;
     }
@@ -141,7 +142,7 @@ class BulkPricingField extends Field
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         $columnSettings = [
             'heading' => [
@@ -154,8 +155,8 @@ class BulkPricingField extends Field
                 'code' => true,
                 'type' => 'number'
             ],
-		];
-		
+        ];
+
         $view = Craft::$app->getView();
         $view->registerAssetBundle(TableSettingsAsset::class);
         $view->registerJs('new Craft.TableFieldSettings(' .
@@ -166,22 +167,23 @@ class BulkPricingField extends Field
             Json::encode($columnSettings, JSON_UNESCAPED_UNICODE) .
             ');');
 
-        $columnsField = $view->renderTemplateMacro('_includes/forms', 'editableTableField', [
-            [
-                'label' => Craft::t('app', 'Table Columns'),
-                'instructions' => Craft::t('app', 'Define the columns your table should have.'),
-                'id' => 'columns',
-                'name' => 'columns',
-                'cols' => $columnSettings,
-                'rows' => $this->columns,
-                'addRowLabel' => Craft::t('app', 'Add a column'),
-                'initJs' => false
-            ]
-		]);
+
+        $columnsField = Cp::editableTableFieldHtml([
+            'label' => Craft::t('app', 'Table Columns'),
+            'instructions' => Craft::t('app', 'Define the columns your table should have.'),
+            'id' => 'columns',
+            'name' => 'columns',
+            'allowAdd' => true,
+            'allowReorder' => true,
+            'allowDelete' => true,
+            'cols' => $columnSettings,
+            'rows' => $this->columns,
+            'initJs' => false,
+        ]);
 
         return $view->renderTemplate('commerce-bulk-pricing/_components/fields/BulkPricingField_settings', [
             'field' => $this,
-			'columnsField' => $columnsField,
+            'columnsField' => $columnsField,
         ]);
     }
 
@@ -203,15 +205,15 @@ class BulkPricingField extends Field
             'prefix' => Craft::$app->getView()->namespaceInputId(''),
             ];
         $jsonVars = Json::encode($jsonVars);
-		
-		if (empty($this->columns)) {
-            return '';
-		}
 
-		$this->columns = array_merge(['col0' => [
-			'heading' => 'Currency',
-			'qty' => 'iso',
-		]], $this->columns);
+        if (empty($this->columns)) {
+            return '';
+        }
+
+        $this->columns = array_merge(['col0' => [
+            'heading' => 'Currency',
+            'qty' => 'iso',
+        ]], $this->columns);
 
         // Translate the column headings
         foreach ($this->columns as &$column) {
@@ -219,33 +221,33 @@ class BulkPricingField extends Field
                 $column['heading'] = Craft::t('site', $column['heading']);
             }
         }
-		unset($column);
-		
-		//Craft::dd($value);
+        unset($column);
+
+        //Craft::dd($value);
 
         if (!is_array($value)) {
-			$value = [];
-			
-			if (Craft::$app->plugins->isPluginEnabled('commerce-currency-prices')) {
-				foreach (Commerce::getInstance()->getPaymentCurrencies()->getAllPaymentCurrencies() as $currency)
-				{
-					$val = [];
-					foreach ($this->columns as $colId => $col) {
-						//$val[$colId] = $colId == 'col0' ? $currency->iso : '';
-						$val[$col['qty']] = $col['qty'] == 'iso' ? $currency->iso : '';
-					}
-					$value[] = $val;
-				}
-			} else {
-				$val = [];
-				$currency = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrency();
-				foreach ($this->columns as $colId => $col) {
-					//$val[$colId] = $colId == 'col0' ? $currency->iso : '';
-					$val[$col['qty']] = $col['qty'] == 'iso' ? $currency->iso : '';
-				}
-				$value[] = $val;
-			}
-		}
+            $value = [];
+
+            if (Craft::$app->plugins->isPluginEnabled('commerce-currency-prices')) {
+                foreach (Commerce::getInstance()->getPaymentCurrencies()->getAllPaymentCurrencies() as $currency)
+                {
+                    $val = [];
+                    foreach ($this->columns as $colId => $col) {
+                        //$val[$colId] = $colId == 'col0' ? $currency->iso : '';
+                        $val[$col['qty']] = $col['qty'] == 'iso' ? $currency->iso : '';
+                    }
+                    $value[] = $val;
+                }
+            } else {
+                $val = [];
+                $currency = Commerce::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrency();
+                foreach ($this->columns as $colId => $col) {
+                    //$val[$colId] = $colId == 'col0' ? $currency->iso : '';
+                    $val[$col['qty']] = $col['qty'] == 'iso' ? $currency->iso : '';
+                }
+                $value[] = $val;
+            }
+        }
 
         // Explicitly set each cell value to an array with a 'value' key
         $checkForErrors = $element && $element->hasErrors($this->handle);
@@ -259,20 +261,20 @@ class BulkPricingField extends Field
                 }
             }
         }
-		unset($row);
-		
-		foreach ($this->columns as &$col) {
-			if ($col['qty'] == 'iso') {
-				$col['type'] = 'heading';
-				$col['heading'] = '';
-			} else {
-				$col['type'] = 'number';
-			}
-		}
+        unset($row);
+
+        foreach ($this->columns as &$col) {
+            if ($col['qty'] == 'iso') {
+                $col['type'] = 'heading';
+                $col['heading'] = '';
+            } else {
+                $col['type'] = 'number';
+            }
+        }
 
         $view = Craft::$app->getView();
-		$id = $view->formatInputId($this->handle);
-		
+        $id = $view->formatInputId($this->handle);
+
         return $view->renderTemplate('commerce-bulk-pricing/_components/fields/BulkPricingField_input', [
             'id' => $id,
             'name' => $this->handle,
@@ -283,29 +285,29 @@ class BulkPricingField extends Field
             'static' => false,
             'addRowLabel' => '',
         ]);
-	}
+    }
 
-	public function getStaticHtml($value, ElementInterface $element): string
-	{
-		return $this->getInputHtml($value, $element);
-	}
-	
-	public function getElementValidationRules(): array
+    public function getStaticHtml($value, ElementInterface $element): string
+    {
+        return $this->getInputHtml($value, $element);
+    }
+
+    public function getElementValidationRules(): array
     {
         return ['validateTableData'];
-	}
-	
-	public function validateTableData(ElementInterface $element)
+    }
+
+    public function validateTableData(ElementInterface $element): void
     {
         /** @var Element $element */
         $value = $element->getFieldValue($this->handle);
-	}
-	
+    }
 
 
-	// Private Methods
+
+    // Private Methods
     // =========================================================================
 
 
-	
+
 }
