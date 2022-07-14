@@ -99,7 +99,7 @@ class BulkPricing extends Plugin
         Event::on(LineItems::class, LineItems::EVENT_POPULATE_LINE_ITEM, function(LineItemEvent $event) {
             $order = $event->lineItem->getOrder();
             $paymentCurrency = $order->getPaymentCurrency();
-            $user = $order->user;
+            $user = $order->customer;
 
             $element = (isset($event->lineItem->purchasable->product->type->hasVariants) && $event->lineItem->purchasable->product->type->hasVariants) ? $event->lineItem->purchasable : $event->lineItem->purchasable->product;
             if ($element) {
