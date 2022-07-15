@@ -15,7 +15,7 @@ use craft\base\Component;
 use craft\commerce\base\AdjusterInterface;
 use craft\commerce\elements\Order;
 use craft\commerce\helpers\Currency;
-use craft\commerce\models\Address;
+use craft\elements\Address;
 use craft\commerce\models\OrderAdjustment;
 use craft\commerce\models\TaxAddressZone;
 use craft\commerce\models\TaxRate;

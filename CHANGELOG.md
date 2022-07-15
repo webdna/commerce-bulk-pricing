@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+## 2.0.0-beta.3 - 2022-07-15
+### Fixed
+- craft\element\Address issue: #16
+
 ## 2.0.0-beta.2 - 2022-07-14
 ### Fixed
 - Depreciation notice: order->user
