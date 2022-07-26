@@ -2,7 +2,7 @@
   "name": "webdna/commerce-bulk-pricing",
   "description": "Bulk pricing for products",
   "type": "craft-plugin",
-  "version": "2.0.0-beta.4",
+  "version": "2.0.1-beta.4",
   "keywords": [
     "craft",
     "cms",
