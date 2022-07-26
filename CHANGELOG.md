@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## 2.0.0-beta.4 - 2022-07-26
 ### Fixed
 - business -> organization nomenclature change
+- Updated default Tax Adjuster  issue: #17
 
 ## 2.0.0-beta.3 - 2022-07-15
 ### Fixed
