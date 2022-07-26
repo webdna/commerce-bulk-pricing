@@ -115,28 +115,28 @@ class Tax extends \craft\commerce\adjusters\Tax
 
         $removeVat = false;
 
-        $vatIdOnAddress = ($this->_address && $this->_address->businessTaxId && $this->_address->country);
+        $vatIdOnAddress = ($this->_address && $this->_address->organizationTaxId && $this->_address->country);
 
         // Do not bother checking VAT ID if the address doesn't match the zone anyway.
         $useZone = ($zone && $this->_matchAddress($zone));
         if ($taxRate->isVat && $vatIdOnAddress && ($useZone || $taxRate->getIsEverywhere())) {
 
             // Do we have a valid VAT ID in our cache?
-            $validBusinessTaxId = Craft::$app->getCache()->exists('commerce:validVatId:' . $this->_address->businessTaxId);
+            $validorganizationTaxId = Craft::$app->getCache()->exists('commerce:validVatId:' . $this->_address->organizationTaxId);
 
             // If we do not have a valid VAT ID in cache, see if we can get one from the API
-            if (!$validBusinessTaxId) {
-                $validBusinessTaxId = $this->_validateVatNumber($this->_address->businessTaxId);
+            if (!$validorganizationTaxId) {
+                $validorganizationTaxId = $this->_validateVatNumber($this->_address->organizationTaxId);
             }
 
-            if ($validBusinessTaxId) {
-                Craft::$app->getCache()->set('commerce:validVatId:' . $this->_address->businessTaxId, '1');
+            if ($validorganizationTaxId) {
+                Craft::$app->getCache()->set('commerce:validVatId:' . $this->_address->organizationTaxId, '1');
                 $removeVat = true;
             }
 
             // Clean up if the API returned false and the item was still in cache
-            if (!$validBusinessTaxId) {
-                Craft::$app->getCache()->delete('commerce:validVatId:' . $this->_address->businessTaxId);
+            if (!$validorganizationTaxId) {
+                Craft::$app->getCache()->delete('commerce:validVatId:' . $this->_address->organizationTaxId);
             }
         }
 
@@ -299,13 +299,13 @@ class Tax extends \craft\commerce\adjusters\Tax
     }
 
     /**
-     * @param string $businessVatId
+     * @param string $organizationVatId
      * @return bool
      */
-    private function _validateVatNumber($businessVatId): bool
+    private function _validateVatNumber($organizationVatId): bool
     {
         try {
-            return $this->_getVatValidator()->validate($businessVatId);
+            return $this->_getVatValidator()->validate($organizationVatId);
         } catch (\Exception $e) {
             Craft::error('Communication with VAT API failed: ' . $e->getMessage(), __METHOD__);
 
