@@ -49,20 +49,20 @@ class BulkPricingField extends Field
         return Craft::t('commerce-bulk-pricing', 'Bulk Pricing');
     }
 
-    public $columns = [
+    public array $columns = [
         'col1' => [
             'heading' => '',
             'qty' => '',
         ]
     ];
 
-    public $columnType = Schema::TYPE_TEXT;
+    public string $columnType = Schema::TYPE_TEXT;
 
-    public $userGroups;
+    public array $userGroups;
 
-    public $taxIncluded;
+    public bool $taxIncluded;
 
-    public $guestUser;
+    public bool $guestUser;
 
     // Public Methods
     // =========================================================================
@@ -99,7 +99,7 @@ class BulkPricingField extends Field
     /**
      * @inheritdoc
      */
-    public function normalizeValue($value, ElementInterface $element = null): mixed
+    public function normalizeValue(mixed $value, ?ElementInterface $element = null): mixed
     {
         if (is_string($value) && !empty($value)) {
             $value = Json::decodeIfJson($value);
@@ -115,7 +115,7 @@ class BulkPricingField extends Field
     /**
      * @inheritdoc
      */
-    public function serializeValue($value, ElementInterface $element = null): mixed
+    public function serializeValue(mixed $value, ?ElementInterface $element = null): mixed
     {
         if (!is_array($value) || empty($this->columns)) {
             return null;
@@ -190,7 +190,7 @@ class BulkPricingField extends Field
     /**
      * @inheritdoc
      */
-    public function getInputHtml($value, ElementInterface $element = null): string
+    public function getInputHtml(mixed $value, ?ElementInterface $element = null): string
     {
 
         // Get our id and namespace
@@ -287,7 +287,7 @@ class BulkPricingField extends Field
         ]);
     }
 
-    public function getStaticHtml($value, ElementInterface $element): string
+    public function getStaticHtml(mixed $value, ElementInterface $element): string
     {
         return $this->getInputHtml($value, $element);
     }

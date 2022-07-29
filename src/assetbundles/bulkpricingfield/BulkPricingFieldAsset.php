@@ -27,7 +27,7 @@ class BulkPricingFieldAsset extends AssetBundle
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         $this->sourcePath = "@webdna/commerce-bulk-pricing/assetbundles/bulkpricingfield/dist";
 

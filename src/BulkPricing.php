@@ -46,7 +46,7 @@ class BulkPricing extends Plugin
     /**
      * @var BulkPricing
      */
-    public static $plugin;
+    public static Plugin $plugin;
 
     // Public Properties
     // =========================================================================
