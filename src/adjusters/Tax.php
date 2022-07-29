@@ -302,7 +302,7 @@ class Tax extends \craft\commerce\adjusters\Tax
      * @param string $businessVatId
      * @return bool
      */
-    private function _validateVatNumber($businessVatId): bool
+    private function _validateVatNumber(string $businessVatId): bool
     {
         try {
             return $this->_getVatValidator()->validate($businessVatId);
@@ -329,7 +329,7 @@ class Tax extends \craft\commerce\adjusters\Tax
      * @param $rate
      * @return OrderAdjustment
      */
-    private function _createAdjustment($rate): OrderAdjustment
+    private function _createAdjustment(TaxRate $rate): OrderAdjustment
     {
         $adjustment = new OrderAdjustment;
         $adjustment->type = self::ADJUSTMENT_TYPE;
