@@ -121,22 +121,22 @@ class BulkPricingField extends Field
             return null;
         }
         return $value;
-        Craft::dump('serialize');
-        Craft::dd($value);
+        // Craft::dump('serialize');
+        // Craft::dd($value);
 
-        $serialized = [];
+        // $serialized = [];
 
-        foreach ($value as $row) {
-            $serializedRow = [];
-            foreach (array_keys($this->columns) as $colId) {
-                $serializedRow[$colId] = parent::serializeValue($row[$colId] ?? null);
-            }
-            $serialized[] = $serializedRow;
-        }
+        // foreach ($value as $row) {
+        //     $serializedRow = [];
+        //     foreach (array_keys($this->columns) as $colId) {
+        //         $serializedRow[$colId] = parent::serializeValue($row[$colId] ?? null);
+        //     }
+        //     $serialized[] = $serializedRow;
+        // }
 
-        Craft::dd($serialized);
+        // Craft::dd($serialized);
 
-        return $serialized;
+        // return $serialized;
     }
 
     /**
