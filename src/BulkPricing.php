@@ -13,6 +13,7 @@ namespace webdna\commerce\bulkpricing;
 use webdna\commerce\bulkpricing\fields\BulkPricingField;
 use webdna\commerce\bulkpricing\models\Settings;
 use webdna\commerce\bulkpricing\adjusters\Tax;
+use webdna\commerce\bulkpricing\integrations\feedme\BulkPricingField as FeedMeBulkPricing;
 
 use craft\commerce\events\LineItemEvent;
 use craft\commerce\services\LineItems;
@@ -27,6 +28,9 @@ use craft\services\Fields;
 use craft\events\RegisterComponentTypesEvent;
 use craft\commerce\records\Sale as SaleRecord;
 // use craft\commerce\models\Sale;
+
+use craft\feedme\events\RegisterFeedMeFieldsEvent;
+use craft\feedme\services\Fields as FeedMeFields;
 
 use yii\base\Event;
 
@@ -75,6 +79,7 @@ class BulkPricing extends Plugin
             }
         );
 
+
         Event::on(
             Plugins::class,
             Plugins::EVENT_AFTER_INSTALL_PLUGIN,
@@ -83,6 +88,7 @@ class BulkPricing extends Plugin
                 }
             }
         );
+
 
         Event::on(OrderAdjustments::class, OrderAdjustments::EVENT_REGISTER_ORDER_ADJUSTERS, function(RegisterComponentTypesEvent $e) {
 
@@ -95,6 +101,12 @@ class BulkPricing extends Plugin
                 }
             }
         });
+
+
+        Event::on(FeedMeFields::class, FeedMeFields::EVENT_REGISTER_FEED_ME_FIELDS, function(RegisterFeedMeFieldsEvent $e) {
+            $e->fields[] = FeedMeBulkPricing::class;
+        });
+
 
         Event::on(LineItems::class, LineItems::EVENT_POPULATE_LINE_ITEM, function(LineItemEvent $event) {
             $order = $event->lineItem->getOrder();
