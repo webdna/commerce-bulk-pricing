@@ -1,11 +1,11 @@
 <?php
 /**
- * Commerce Bulk Pricing plugin for Craft CMS 3.x
+ * Commerce Bulk Pricing plugin for Craft CMS 4.x Commerce 4.x
  *
  * Bulk pricing for products
  *
  * @link      https://webdna.co.uk
- * @copyright Copyright (c) 2019 webdna
+ * @copyright Copyright (c) 2022 webdna
  */
 
 namespace webdna\commerce\bulkpricing\fields;
@@ -58,11 +58,11 @@ class BulkPricingField extends Field
 
     public string $columnType = Schema::TYPE_TEXT;
 
-    public array $userGroups;
+    public array $userGroups = [];
 
-    public bool $taxIncluded;
+    public bool $taxIncluded = false;
 
-    public bool $guestUser;
+    public bool $guestUser = false;
 
     // Public Methods
     // =========================================================================
