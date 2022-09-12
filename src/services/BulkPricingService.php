@@ -40,7 +40,7 @@ class BulkPricingService extends Component
      * @param LineItem $lineItem The line item to to calculate bulk price for.
      * @return LineItem
      */
-    public function applyBulkPricing(LineItem $lineItem, User $user, string $paymentCurrency): LineItem
+    public function applyBulkPricing(LineItem $lineItem, ?User $user, string $paymentCurrency): LineItem
     {
         $element = (isset($lineItem->purchasable->product->type->hasVariants) && $lineItem->purchasable->product->type->hasVariants) ? $lineItem->purchasable : $lineItem->purchasable->product;
         if ($element) {
