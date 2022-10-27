@@ -48,10 +48,10 @@ class BulkPricingService extends Component
             {
                 if ( (get_class($f = Craft::$app->getFields()->getFieldByHandle($key)) == BulkPricingField::class) && (is_array($field)) ) {
                     $apply = false;
-                    
+
                     if($user || $f->guestUser){
 
-                        if(is_array($f->userGroups)) {
+                        if(is_array($f->userGroups) && count($f->userGroups) > 0) {
                             foreach ($f->userGroups as $group)
                             {
                                 if ($user->isInGroup($group)) {
