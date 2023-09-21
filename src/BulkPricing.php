@@ -30,7 +30,9 @@ use craft\commerce\records\Sale as SaleRecord;
 // use craft\commerce\models\Sale;
 
 use craft\feedme\events\RegisterFeedMeFieldsEvent;
+use craft\feedme\events\RegisterFeedMeNestedFieldsEvent;
 use craft\feedme\services\Fields as FeedMeFields;
+use craft\feedme\elements\CommerceProduct as FeedMeCommerceProduct;
 
 use yii\base\Event;
 
@@ -99,6 +101,9 @@ class BulkPricing extends Plugin
         if (Craft::$app->getPlugins()->isPluginEnabled('feed-me')) {
             Event::on(FeedMeFields::class, FeedMeFields::EVENT_REGISTER_FEED_ME_FIELDS, function(RegisterFeedMeFieldsEvent $e) {
                 $e->fields[] = FeedMeBulkPricing::class;
+            });
+            Event::on(FeedMeCommerceProduct::class, FeedMeCommerceProduct::EVENT_REGISTER_FEED_ME_NESTED_FIELDS, function(RegisterFeedMeNestedFieldsEvent $e) {
+                $e->nestedFields[] = BulkPricingField::class;
             });
         }
 
