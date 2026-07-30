@@ -1,6 +1,6 @@
 <?php
 /**
- * Commerce Bulk Pricing plugin for Craft CMS 4.x Commerce 4.x
+ * Commerce Bulk Pricing plugin for Craft CMS 4.x/5.x Commerce 4.x/5.x
  *
  * Bulk pricing for products
  *
@@ -90,10 +90,24 @@ class BulkPricingField extends Field
 
     /**
      * @inheritdoc
+     *
+     * Craft 4 only. Craft 5 removed getContentColumnType() and stores custom
+     * field content in a single JSON column, keyed by field UID — see dbType().
      */
     public function getContentColumnType(): string
     {
         return $this->columnType;
+    }
+
+    /**
+     * Craft 5 only. Tells Craft how this field's value is stored in the shared
+     * JSON content column. JSON matches Craft's own Table field. This static
+     * method does not exist on the Craft 4 base class, where it is simply
+     * ignored in favour of getContentColumnType().
+     */
+    public static function dbType(): array|string|null
+    {
+        return Schema::TYPE_JSON;
     }
 
     /**

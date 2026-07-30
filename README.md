@@ -1,10 +1,10 @@
-# Commerce Bulk Pricing plugin for Craft CMS 3.x
+# Commerce Bulk Pricing plugin for Craft CMS 4.x & 5.x
 
 A Craft fieldtype for setting product prices based on the quantity purchased and/or by user group
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 4.0 or 5.0 (or later) and Craft Commerce 4 or 5.
 
 ## Installation
 

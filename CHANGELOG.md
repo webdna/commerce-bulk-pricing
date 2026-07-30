@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+## 3.0.0 - 2026-07-30
+### Added
+- Support for Craft CMS 5 and Craft Commerce 5, alongside continued support for Craft 4 / Commerce 4.
+
+### Changed
+- The field now reports its content column via `dbType()` (JSON) on Craft 5, while keeping `getContentColumnType()` for Craft 4.
+- On Commerce 5, the effective price is applied via the line item's `promotionalPrice` (Commerce 5 made `salePrice` a read-only, derived property). Behaviour on Commerce 4 is unchanged.
+- Variant detection now uses `maxVariants` on Commerce 5 to avoid the deprecated `ProductType::hasVariants` warning.
+- The `taxIncluded` snapshot flag is now written via `setSnapshot()` on Commerce 5 (where `snapshot` is no longer a public array).
+
+### Note
+- On Commerce 5, bulk pricing continues to stack with legacy **Sales** (as before). It does not stack with **catalog pricing rules** — when a bulk price applies, it is authoritative and any catalog promotional price is cleared for that line item.
+
 ## 2.1.1 - 2022-10-27
 ### Fixed
 - Bug checking against user group list
