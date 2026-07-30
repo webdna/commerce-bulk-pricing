@@ -1,6 +1,6 @@
 <?php
 /**
- * Commerce Bulk Pricing plugin for Craft CMS 4.x Commerce 4.x
+ * Commerce Bulk Pricing plugin for Craft CMS 4.x/5.x Commerce 4.x/5.x
  *
  * Bulk pricing for products
  *

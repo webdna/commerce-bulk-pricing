@@ -1,6 +1,6 @@
 <?php
 /**
- * Commerce Bulk Pricing plugin for Craft CMS 4.x Commerce 4.x
+ * Commerce Bulk Pricing plugin for Craft CMS 4.x/5.x Commerce 4.x/5.x
  *
  * Bulk pricing for products
  *
@@ -42,7 +42,15 @@ class BulkPricingService extends Component
      */
     public function applyBulkPricing(LineItem $lineItem, ?User $user, string $paymentCurrency): LineItem
     {
-        $element = (isset($lineItem->purchasable->product->type->hasVariants) && $lineItem->purchasable->product->type->hasVariants) ? $lineItem->purchasable : $lineItem->purchasable->product;
+        // The bulk pricing field lives on the variant when the product type has
+        // variants, otherwise on the product itself. Commerce 5 deprecated
+        // ProductType::hasVariants in favour of `maxVariants > 1`, so detect the
+        // property to stay quiet (no deprecation log) on both major versions.
+        $productType = $lineItem->purchasable->product->type ?? null;
+        $hasVariants = $productType && (property_exists($productType, 'maxVariants')
+            ? $productType->maxVariants > 1
+            : !empty($productType->hasVariants));
+        $element = $hasVariants ? $lineItem->purchasable : $lineItem->purchasable->product;
         if ($element) {
             foreach ($element->getFieldValues() as $key => $field)
             {
@@ -121,12 +129,12 @@ class BulkPricingService extends Component
                                             $salePrice = 0;
                                         }
 
-                                        $lineItem->salePrice = strval($salePrice);
+                                        $this->setEffectivePrice($lineItem, $salePrice);
                                     } else {
-                                        $lineItem->salePrice = strval($value);
+                                        $this->setEffectivePrice($lineItem, $value);
                                     }
 
-                                    $lineItem->snapshot['taxIncluded'] = (bool)$f->taxIncluded;
+                                    $this->flagTaxIncluded($lineItem, (bool)$f->taxIncluded);
                                 }
                             }
 
@@ -144,6 +152,51 @@ class BulkPricingService extends Component
             }
 
             return $lineItem;
+        }
+    }
+
+    /**
+     * Set the effective (discounted) unit price on a line item, working across
+     * Commerce 4 and Commerce 5.
+     *
+     * Commerce 4 exposes a settable `salePrice`. Commerce 5 made `salePrice` a
+     * read-only getter derived from `promotionalPrice`, so we set that instead —
+     * but only when the effective price is actually lower than the (already
+     * overridden) base price. That mirrors Commerce 4's on-sale semantics and
+     * clears any catalog-pricing promotional price that would otherwise leak
+     * through on top of the bulk price.
+     *
+     * @param float|int|string $effective The effective price to charge per unit.
+     */
+    private function setEffectivePrice(LineItem $lineItem, float|int|string $effective): void
+    {
+        if (method_exists($lineItem, 'setPromotionalPrice')) {
+            // Commerce 5+: salePrice is read-only and derived from promotionalPrice.
+            $lineItem->setPromotionalPrice((float)$effective < $lineItem->getPrice() ? (float)$effective : null);
+        } else {
+            // Commerce 4: salePrice is a settable property.
+            $lineItem->salePrice = strval($effective);
+        }
+    }
+
+    /**
+     * Record the tax-included flag on the line item snapshot, working across
+     * Commerce 4 and Commerce 5.
+     *
+     * Commerce 4 exposes `snapshot` as a public array. Commerce 5 made it a
+     * private property behind getSnapshot()/setSnapshot(), so writing to an
+     * array index directly no longer persists — merge and set the array back.
+     */
+    private function flagTaxIncluded(LineItem $lineItem, bool $taxIncluded): void
+    {
+        if (method_exists($lineItem, 'setSnapshot')) {
+            // Commerce 5+
+            $snapshot = $lineItem->getSnapshot() ?? [];
+            $snapshot['taxIncluded'] = $taxIncluded;
+            $lineItem->setSnapshot($snapshot);
+        } else {
+            // Commerce 4
+            $lineItem->snapshot['taxIncluded'] = $taxIncluded;
         }
     }
 
