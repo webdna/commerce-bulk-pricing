@@ -2,7 +2,7 @@
 spec: Commerce Bulk Pricing 3.1
 slug: bulk-pricing-3-1
 status: draft
-version: 0.2
+version: 0.3
 date: 2026-10-20
 author: Claude (with Sam Birch)
 client: webdna (Craft Plugin Store product)
@@ -12,7 +12,7 @@ related: [webdna/commerce-bulk-pricing #11, #12, #13]
 
 # Commerce Bulk Pricing 3.1
 
-> **Status:** draft - **Version:** 0.2
+> **Status:** draft - **Version:** 0.3
 > The issues decided with Sam on 20 Oct 2026: a template can show the price a customer will pay
 > at a quantity, sales included, and list a product's price breaks as rows; a module can act on a
 > line item after its bulk price is set. #4 (prices by category) stays in the backlog.
@@ -113,6 +113,9 @@ Unchanged. A field value is `{ISO: {iso: ISO, "<qty>": "<price>", …}}`; headin
 - **TS-3** A 10% Sale: rows' `salePrice` and `price()` drop 10%; a line item at the same qty has the same `getSalePrice()` (BR-1).
 - **TS-4** A group-restricted field: a member of the group gets rows, a non-member and a guest get none; guest with `guestUser` on does not crash (BR-6).
 - **TS-5** A currency the value lacks gives no rows and the normal price.
+- **TS-7** Defaults in a web request, no options: with a session cart in a second currency, `price()`
+  and `rows()` use it; with no cart, the primary currency, and no cart is started; a signed-in group
+  member gets the trade row, a guest does not.
 - **TS-6** The event fires once per populate (twice per new line item) with `applied`, `row`, `field`, `order` set; with no row, `applied` false.
 
 ---
@@ -126,7 +129,7 @@ One phase; the lookup comes first because the other two read it.
 - [x] **1.1 Shared lookup** — `src/services/BulkPricingService.php`, `src/models/PriceRow.php`
       Rules: BR-1–8, BR-10, BR-11 · Verify: TS-1–5
 - [x] **1.2 Twig API (#11, #13)** — `src/variables/BulkPricingVariable.php`, `src/BulkPricing.php` (CraftVariable init)
-      Rules: BR-1, BR-5 · Verify: TS-1–5 through the variable
+      Rules: BR-1, BR-5 · Verify: TS-1–5 through the variable, TS-7
 - [x] **1.3 After-apply event (#12)** — `src/events/ApplyBulkPricingEvent.php`, `src/services/BulkPricingService.php`
       Rules: BR-9 · Verify: TS-6
       *Built 20 Oct 2026.* `scripts/check.php` in craft5 (Commerce 5.7.5): 18 checks, all passed. Found, not
@@ -158,7 +161,7 @@ Read the triage memory (`plugin-issue-triage-20-oct.md`, bulk-pricing) and issue
 
 ## B4. Definition of done
 
-- [x] TS-1–TS-6 pass in craft5 (Commerce 5)
+- [x] TS-1–TS-7 pass in craft5 (Commerce 5)
 - [x] `php -l` clean on every changed file
 - [x] CHANGELOG and README describe the change
 
@@ -168,6 +171,9 @@ Read the triage memory (`plugin-issue-triage-20-oct.md`, bulk-pricing) and issue
 # from ~/projects/craft5 — the script builds its fixtures in a transaction and rolls back
 ddev exec php plugins/commerce-bulk-pricing/scripts/check.php
 # expect: every TS line PASS, final line "all passed"
+ddev exec php plugins/commerce-bulk-pricing/scripts/check-web.php cart
+ddev exec php plugins/commerce-bulk-pricing/scripts/check-web.php nocart
+# expect: five TS-7 lines PASS each, "all passed" (one process per case: Craft reads cookies once)
 ddev exec "php -l plugins/commerce-bulk-pricing/src/<file>" for each changed file
 ```
 
@@ -185,3 +191,4 @@ Not runnable here: Commerce 4 (no Craft 4 sandbox). BR-10 is kept by reading, no
 |---|---|---|---|
 | 2026-10-20 | 0.1 | First draft, from the triage of 20 Oct 2026 | Claude (with Sam Birch) |
 | 2026-10-20 | 0.2 | Built. BR-11 added (variant fields on unlimited-variant types, found building the fixtures); BR-9/TS-6: two populates per new line item | Claude |
+| 2026-10-20 | 0.3 | TS-7 (defaults in a web request, `scripts/check-web.php`) passed; changelog warns of the BR-11 price change; released as 3.1.0 without a Commerce 4 run (Sam) | Claude |
