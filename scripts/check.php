@@ -14,25 +14,18 @@
 
 use webdna\commerce\bulkpricing\BulkPricing;
 use webdna\commerce\bulkpricing\events\ApplyBulkPricingEvent;
-use webdna\commerce\bulkpricing\fields\BulkPricingField;
 use webdna\commerce\bulkpricing\services\BulkPricingService;
 
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\elements\Order;
-use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
-use craft\commerce\models\ProductType;
-use craft\commerce\models\ProductTypeSite;
 use craft\commerce\models\Sale;
-use craft\elements\User;
-use craft\fieldlayoutelements\CustomField;
-use craft\models\FieldLayout;
-use craft\models\FieldLayoutTab;
 use craft\web\View;
 use yii\base\Event;
 
 require getcwd() . '/bootstrap.php';
 $app = require CRAFT_VENDOR_PATH . '/craftcms/cms/bootstrap/console.php';
+require __DIR__ . '/fixtures.php';
 
 $failures = 0;
 $check = function(string $name, bool $ok, string $detail = '') use (&$failures) {
@@ -48,74 +41,15 @@ Craft::$app->getPlugins()->enablePlugin('commerce-bulk-pricing');
 
 $commerce = Commerce::getInstance();
 $service = BulkPricing::$plugin->service;
-$elements = Craft::$app->getElements();
 $view = Craft::$app->getView();
 $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
 $twig = fn(string $template, array $vars = []) => trim($view->renderString($template, $vars));
 
 try {
-    $iso = $commerce->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso();
-
-    // Discounts are order context price() cannot see (one that ignores promotions drops a sale
-    // from the line item), so the install's own discounts are switched off for the check.
-    Craft::$app->getDb()->createCommand()->update('{{%commerce_discounts}}', ['enabled' => false])->execute();
-
-    // A group with a member, and a user outside it.
-    $member = $outsider = $group = null;
-    foreach (Craft::$app->getUserGroups()->getAllGroups() as $candidate) {
-        $member = User::find()->groupId($candidate->id)->one();
-        $outsider = User::find()->admin(false)->groupId(['not', $candidate->id])->one();
-        if ($member && $outsider && !$outsider->isInGroup($candidate)) {
-            $group = $candidate;
-            break;
-        }
-    }
-    if (!$group) {
-        throw new RuntimeException('Needs a user group with a member and a non-admin user outside it');
-    }
-
-    // Columns deliberately out of order, and a blank 30+ cell (TS-1).
-    $suffix = substr(md5((string)microtime(true)), 0, 6);
-    $public = new BulkPricingField([
-        'name' => 'BP check public', 'handle' => 'bpCheckPublic' . $suffix, 'guestUser' => true,
-        'columns' => [
-            'col1' => ['heading' => '20+', 'qty' => '20'],
-            'col2' => ['heading' => '10+', 'qty' => '10'],
-            'col3' => ['heading' => '30+', 'qty' => '30'],
-        ],
-    ]);
-    $trade = new BulkPricingField([
-        'name' => 'BP check trade', 'handle' => 'bpCheckTrade' . $suffix, 'guestUser' => true,
-        'userGroups' => [(string)$group->id],
-        'columns' => ['col1' => ['heading' => 'Trade', 'qty' => '1']],
-    ]);
-    foreach ([$public, $trade] as $field) {
-        Craft::$app->getFields()->saveField($field) || $fail('field', $field);
-    }
-
-    // Unlimited variants (maxVariants null), the field on the variant (BR-11).
-    $productType = new ProductType(['name' => 'BP check', 'handle' => 'bpCheck' . $suffix]);
-    $siteSettings = [];
-    foreach (Craft::$app->getSites()->getAllSites() as $site) {
-        $siteSettings[$site->id] = new ProductTypeSite(['siteId' => $site->id, 'hasUrls' => false]);
-    }
-    $productType->setSiteSettings($siteSettings);
-    $layout = new FieldLayout(['type' => Variant::class]);
-    $tab = new FieldLayoutTab(['name' => 'Content', 'layout' => $layout]);
-    $tab->setElements([new CustomField($public), new CustomField($trade)]);
-    $layout->setTabs([$tab]);
-    $productType->getBehavior('variantFieldLayout')->setFieldLayout($layout);
-    $commerce->getProductTypes()->saveProductType($productType) || $fail('product type', $productType);
-
-    $product = new Product(['typeId' => $productType->id, 'title' => 'BP check']);
-    $elements->saveElement($product) || $fail('product', $product);
-    $variant = new Variant(['title' => 'BP check', 'sku' => 'BP-CHECK-' . $suffix, 'basePrice' => 60, 'promotable' => true]);
-    $variant->setPrimaryOwner($product);
-    $variant->setOwner($product);
-    $variant->setFieldValue($public->handle, [$iso => ['iso' => $iso, '20' => '45', '10' => '50', '30' => '']]);
-    $variant->setFieldValue($trade->handle, [$iso => ['iso' => $iso, '1' => '40']]);
-    $elements->saveElement($variant) || $fail('variant', $variant);
-    $variant = Variant::find()->id($variant->id)->status(null)->one();
+    [
+        'variant' => $variant, 'public' => $public, 'trade' => $trade,
+        'member' => $member, 'outsider' => $outsider, 'iso' => $iso,
+    ] = bulkPricingFixtures();
 
     // TS-1: rows sorted, the blank cell skipped, headings carried.
     $rows = $service->getPriceRows($variant, null, $iso);

@@ -3,7 +3,10 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
-## 3.1.0 - Unreleased
+## 3.1.0 - 2026-10-20
+
+> {warning} **Prices may change on Commerce 5 stores.** A bulk pricing field on a product type's *variant* layout was ignored when the product type allows unlimited variants (Commerce 5's default). From 3.1 it applies, so carts for those variants will start charging the bulk prices that were entered there. Before updating, check each product type with unlimited variants: if a bulk pricing field on its variant layout holds prices you do not want charged, clear them or remove the field.
+
 ### Added
 - `craft.bulkPricing.price(purchasable, qty)` — the unit price the cart charges at a quantity, sales included ([#11](https://github.com/webdna/commerce-bulk-pricing/issues/11)).
 - `craft.bulkPricing.rows(purchasable)` — the price breaks as `{heading, qty, price, salePrice}`, lowest quantity first ([#13](https://github.com/webdna/commerce-bulk-pricing/issues/13)).
@@ -11,7 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `EVENT_APPLY_BULK_PRICING` now carries an `ApplyBulkPricingEvent` with the order, whether a bulk price was applied, the row and the field, and is documented ([#12](https://github.com/webdna/commerce-bulk-pricing/issues/12)). It still extends `LineItemEvent`, so existing handlers keep working.
 
 ### Fixed
-- A bulk pricing field on the variant is now read on product types with unlimited variants (Commerce 5's default), which were treated as having none.
+- A bulk pricing field on the variant is now read on product types with unlimited variants (Commerce 5's default), which were treated as having none — see the warning above.
 - A guest no longer causes an error against a group-restricted field with guest pricing on.
 - Price breaks apply by quantity whatever order the columns are in.
 - A purchasable that is not a product variant no longer causes an error.
