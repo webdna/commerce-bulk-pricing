@@ -2,7 +2,7 @@
 spec: Commerce Bulk Pricing 3.1
 slug: bulk-pricing-3-1
 status: draft
-version: 0.1
+version: 0.2
 date: 2026-10-20
 author: Claude (with Sam Birch)
 client: webdna (Craft Plugin Store product)
@@ -12,7 +12,7 @@ related: [webdna/commerce-bulk-pricing #11, #12, #13]
 
 # Commerce Bulk Pricing 3.1
 
-> **Status:** draft - **Version:** 0.1
+> **Status:** draft - **Version:** 0.2
 > The issues decided with Sam on 20 Oct 2026: a template can show the price a customer will pay
 > at a quantity, sales included, and list a product's price breaks as rows; a module can act on a
 > line item after its bulk price is set. #4 (prices by category) stays in the backlog.
@@ -89,9 +89,13 @@ Unchanged. A field value is `{ISO: {iso: ISO, "<qty>": "<price>", …}}`; headin
 - **BR-8** Rows apply by quantity regardless of column order — 3.0 depended on the columns being
   in ascending order.
 - **BR-9** `EVENT_APPLY_BULK_PRICING` fires once per populate, whether or not a price applied, with
-  `ApplyBulkPricingEvent {lineItem, isNew: false, order, applied, row, field}`.
+  `ApplyBulkPricingEvent {lineItem, isNew: false, order, applied, row, field}`. Commerce populates a
+  new line item twice (`populate()`, then `refresh()`), so a new line item raises it twice.
 - **BR-10** Code stays valid on PHP 8.0.2 and on Craft 4 / Commerce 4 (the composer floor): no
   enums, readonly, `new` in initialisers or Commerce-5-only calls without a guard.
+- **BR-11** The bulk fields are read from the variant when its layout has one, else from the product
+  — not from the product type's variant setting. 3.0 read `maxVariants > 1`, which on Commerce 5's
+  default (unlimited, `maxVariants` null) said "no variants", so a variant's bulk field never applied.
 
 ## 6. Interfaces
 
@@ -109,7 +113,7 @@ Unchanged. A field value is `{ISO: {iso: ISO, "<qty>": "<price>", …}}`; headin
 - **TS-3** A 10% Sale: rows' `salePrice` and `price()` drop 10%; a line item at the same qty has the same `getSalePrice()` (BR-1).
 - **TS-4** A group-restricted field: a member of the group gets rows, a non-member and a guest get none; guest with `guestUser` on does not crash (BR-6).
 - **TS-5** A currency the value lacks gives no rows and the normal price.
-- **TS-6** The event fires once per populated line item with `applied`, `row`, `field`, `order` set; with no row, `applied` false.
+- **TS-6** The event fires once per populate (twice per new line item) with `applied`, `row`, `field`, `order` set; with no row, `applied` false.
 
 ---
 
@@ -119,13 +123,17 @@ One phase; the lookup comes first because the other two read it.
 
 ### Tasks
 
-- [ ] **1.1 Shared lookup** — `src/services/BulkPricingService.php`, `src/models/PriceRow.php`
-      Rules: BR-1–8, BR-10 · Verify: TS-1–5
-- [ ] **1.2 Twig API (#11, #13)** — `src/variables/BulkPricingVariable.php`, `src/BulkPricing.php` (CraftVariable init)
+- [x] **1.1 Shared lookup** — `src/services/BulkPricingService.php`, `src/models/PriceRow.php`
+      Rules: BR-1–8, BR-10, BR-11 · Verify: TS-1–5
+- [x] **1.2 Twig API (#11, #13)** — `src/variables/BulkPricingVariable.php`, `src/BulkPricing.php` (CraftVariable init)
       Rules: BR-1, BR-5 · Verify: TS-1–5 through the variable
-- [ ] **1.3 After-apply event (#12)** — `src/events/ApplyBulkPricingEvent.php`, `src/services/BulkPricingService.php`
+- [x] **1.3 After-apply event (#12)** — `src/events/ApplyBulkPricingEvent.php`, `src/services/BulkPricingService.php`
       Rules: BR-9 · Verify: TS-6
-- [ ] **1.4 Release notes** — `README.md` (Twig + event), `CHANGELOG.md` (3.1.0, unreleased), `composer.json` version 3.1.0
+      *Built 20 Oct 2026.* `scripts/check.php` in craft5 (Commerce 5.7.5): 18 checks, all passed. Found, not
+      fixed: a discount that **ignores promotions** makes Commerce drop the sale from a line item, but a bulk
+      row then sets its own sale price on top (3.0 behaviour, kept); and `price()` cannot see discounts at all,
+      being order context — the check switches the install's discounts off. Both noted in the README.
+- [x] **1.4 Release notes** — `README.md` (Twig + event), `CHANGELOG.md` (3.1.0, unreleased), `composer.json` version 3.1.0
       Verify: B5
 
 ---
@@ -150,9 +158,9 @@ Read the triage memory (`plugin-issue-triage-20-oct.md`, bulk-pricing) and issue
 
 ## B4. Definition of done
 
-- [ ] TS-1–TS-6 pass in craft5 (Commerce 5)
-- [ ] `php -l` clean on every changed file
-- [ ] CHANGELOG and README describe the change
+- [x] TS-1–TS-6 pass in craft5 (Commerce 5)
+- [x] `php -l` clean on every changed file
+- [x] CHANGELOG and README describe the change
 
 ## B5. Verification
 
@@ -176,3 +184,4 @@ Not runnable here: Commerce 4 (no Craft 4 sandbox). BR-10 is kept by reading, no
 | Date | Version | Change | By |
 |---|---|---|---|
 | 2026-10-20 | 0.1 | First draft, from the triage of 20 Oct 2026 | Claude (with Sam Birch) |
+| 2026-10-20 | 0.2 | Built. BR-11 added (variant fields on unlimited-variant types, found building the fixtures); BR-9/TS-6: two populates per new line item | Claude |
