@@ -14,6 +14,7 @@ use webdna\commerce\bulkpricing\fields\BulkPricingField;
 use webdna\commerce\bulkpricing\services\BulkPricingService;
 use webdna\commerce\bulkpricing\models\Settings;
 use webdna\commerce\bulkpricing\integrations\feedme\BulkPricingField as FeedMeBulkPricing;
+use webdna\commerce\bulkpricing\variables\BulkPricingVariable;
 
 use craft\commerce\events\LineItemEvent;
 use craft\commerce\services\LineItems;
@@ -26,6 +27,7 @@ use craft\services\Plugins;
 use craft\events\PluginEvent;
 use craft\services\Fields;
 use craft\events\RegisterComponentTypesEvent;
+use craft\web\twig\variables\CraftVariable;
 use craft\commerce\records\Sale as SaleRecord;
 // use craft\commerce\models\Sale;
 
@@ -102,6 +104,12 @@ class BulkPricing extends Plugin
             });
         }
 
+
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
+            /** @var CraftVariable $variable */
+            $variable = $event->sender;
+            $variable->set('bulkPricing', BulkPricingVariable::class);
+        });
 
         Event::on(LineItems::class, LineItems::EVENT_POPULATE_LINE_ITEM, function(LineItemEvent $event) {
             $order = $event->lineItem->getOrder();
