@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+## 3.1.1 - 2026-10-23
+
+### Changed
+- New plugin icon: a white glyph on a black circle, with a white icon mask for the control panel nav.
+
 ## 3.1.0 - 2026-10-20
 
 > {warning} **Prices may change on Commerce 5 stores.** A bulk pricing field on a product type's *variant* layout was ignored when the product type allows unlimited variants (Commerce 5's default). From 3.1 it applies, so carts for those variants will start charging the bulk prices that were entered there. Before updating, check each product type with unlimited variants: if a bulk pricing field on its variant layout holds prices you do not want charged, clear them or remove the field.
